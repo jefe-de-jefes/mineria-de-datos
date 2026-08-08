@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.pyo
+.Python
+COMPLAINTS_RECEIVED_2020-2024.txt
+venv/
+.venv/
+env/
