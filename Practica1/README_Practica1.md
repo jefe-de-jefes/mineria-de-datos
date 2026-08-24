@@ -7,12 +7,10 @@
 
 **Fuente:** National Highway Traffic Safety Administration (NHTSA), U.S. Department of Transportation
 **URL de descarga:** https://www.nhtsa.gov/nhtsa-datasets-and-apis (sección "Complaints")
-**Archivo usado:** `COMPLAINTS_RECEIVED_2020-2024.zip` (72 MB comprimido, ~312 MB descomprimido)
+**Archivo usado:** `COMPLAINTS_RECEIVED_2020-2024.zip`
 **Diccionario de campos:** `CMPL.txt` (51 campos documentados por NHTSA)
 
 ### Por qué este dataset
-
-Se evaluaron tres áreas de interés personal antes de decidir: **redes/infraestructura**, **call center**, y **autos/mecánica**. Se descartó call center porque, tras investigar varias fuentes (Kaggle, data.world), no existe un dataset público de call center que cumpla simultáneamente los 5 requisitos del curso (fecha con continuidad, texto libre, numérico, categórico, 5000+ filas) — la mayoría de datasets de ese dominio son o puramente transaccionales (sin texto) o transcripciones (sin fecha/numérico). Se descartó redes por el mismo motivo: los datasets de intrusion detection casi nunca traen texto libre ni fechas con continuidad real.
 
 Se eligió NHTSA Complaints porque:
 - Cumple los 5 requisitos desde el archivo crudo, sin necesidad de combinar fuentes
