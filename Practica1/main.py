@@ -1,23 +1,22 @@
 import pandas as pd
+from mappings import *
 
 def load_columns(doc_path: str) -> list:
     heads = []
-    file = open(doc_path, 'r')
-    for linea in file.readlines():
-        parts = linea.split()
-        if parts and parts[0].isdigit():
-            heads.append(parts[1])
-        else:
-            continue
+    with open(doc_path, 'r') as f:
+        for linea in f:
+            parts = linea.split()
+            if parts and parts[0].isdigit():
+                heads.append(parts[1])
     return heads
 
 def load_data(data_path: str, doc_path: str) -> pd.DataFrame:
     heads = load_columns(doc_path)
-    df = pd.read_csv(data_path, sep='\t', header=None, names=heads)
+    df = pd.read_csv(data_path, sep='\t', header=None, names=heads, low_memory=False)
     return df
 
 def delete_unused_columns(df) -> pd.DataFrame:
-    return df.drop(columns=["STATE_OF_INCIDENT", "VEHICLE_OPERATOR", "OCCURENCES", "PURCH_DT", "NUM_CYLS", "MANUF_DT"], inplace=False)
+    return df.drop(columns=["STATE_OF_INCIDENT", "VEHICLE_OPERATOR", "OCCURENCES", "PURCH_DT", "NUM_CYLS", "MANUF_DT", "DEALER_TEL", "DEALER_ZIP"], inplace=False)
 
 def refill_empty_object_columns(df, comment: str, percentage: float) -> pd.DataFrame:
     is_object =df.dtypes == 'object'
@@ -60,26 +59,26 @@ def refill_year(df)-> pd.DataFrame:
     df['YEARTXT'] = df['YEARTXT'].replace(9999, pd.NA)
     return df
 
-def normalizar_marca(df: pd.DataFrame, specials: dict) -> pd.DataFrame:
-    df["MAKETXT"] = df["MAKETXT"].str.upper().str.replace("-", " ").str.split().str.join(" ")
-    df["MAKETXT"] = df["MAKETXT"].replace(specials)
+def normalizar_marca(df: pd.DataFrame, columna: str, specials: dict = None) -> pd.DataFrame:
+    if specials is None:
+        specials = {}
+    df[columna] = df[columna].str.upper().str.replace("-", " ").str.split().str.join(" ")
+    df[columna] = df[columna].replace(specials)
     return df
 
-def main ():
+def revisar_columna(df, columna):
+    print(f"{columna}: {df[columna].nunique()} valores únicos")
+    print(sorted(df[columna].unique()))
+    print(df[columna].value_counts())
+
+def create_column_comp(df):
+    df['COMP_MAIN'] = df['COMPDESC'].str.split(':').str[0].str.upper().str.strip()
+    return df
+
+def main():
     data_path = 'COMPLAINTS_RECEIVED_2020-2024.txt'
     doc_path = "CMPL.txt"
-    middle_empty_columns = ["ORIG_OWNER_YN", "ANTI_BRAKES_YN", "CRUISE_CONT_YN", "VEHICLES_TOWED_YN", "VIN"]
-    columns_with_empty_rows = ["MFR_NAME", "MAKETXT", "MODELTXT","YEARTXT","COMPDESC", "CITY","CDESCR", "PROD_TYPE"]
-    date_columns = ["FAILDATE", "DATEA", "LDATE"]
-    invalid_states = ['PR', 'GU', 'VI', 'AS', 'MP', 'AE', 'AA', 'AP', 'NN', 'CD', 'UN', '??', '00']
-    specials = {
-        "UNKNOWN MANUFACTURER": "UNKNOWN",
-        "4 STAR TRAILER": "4 STAR",
-        "LIVIN' LITE": "LIVIN LITE",
-    }
-
     df = load_data(data_path, doc_path)
-    print(df.shape)
     df = filter_by_product_type(df, "V")
     df = delete_invalid_states(df, invalid_states)
     df = delete_unused_columns(df)
@@ -90,8 +89,12 @@ def main ():
     df = convert_dates(df, date_columns)
     df = delete_invalid_dates(df)
     df = refill_year(df)
-    df = normalizar_marca(df, specials)
-    print(df['MAKETXT'].nunique())
-    print(sorted(df['MAKETXT'].unique()))
-    print(df.shape)
+    df = normalizar_marca(df, "MAKETXT", specials_maketxt)
+    df = normalizar_marca(df, "MFR_NAME", specials_mfr_name)
+    df = create_column_comp(df)
+    df = normalizar_marca(df, "COMP_MAIN", specials_comp_main)
+    df = normalizar_marca(df, "MODELTXT", specials_modeltxt)
+    df.to_csv('../data/nhtsa_clean.csv', index=False)
+    print(f"Limpieza completa: {df.shape}. Archivo guardado en ../data/nhtsa_clean.csv")
+
 main()
