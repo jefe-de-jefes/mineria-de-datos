@@ -66,7 +66,7 @@ Las tres relaciones son de tipo **uno a muchos (1:N)**, todas centradas en la en
 
 ## 5. Diagrama entidad-relación
 
-Diagrama construido en PlantUML (notación IE / pata de cuervo), archivo fuente en [`diagrama_er.puml`](./diagrama_er.puml), exportado como [`diagrama_er.png`](./diagrama_er.png).
+Diagrama construido en PlantUML.
 
 ```
 VEHICULO ||--o{ QUEJA : "tiene"
