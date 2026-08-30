@@ -7,10 +7,12 @@
 
 **Fuente:** National Highway Traffic Safety Administration (NHTSA), U.S. Department of Transportation
 **URL de descarga:** https://www.nhtsa.gov/nhtsa-datasets-and-apis (sección "Complaints")
-**Archivo usado:** `COMPLAINTS_RECEIVED_2020-2024.zip`
+**Archivo usado:** `COMPLAINTS_RECEIVED_2020-2024.zip` (72 MB comprimido, ~312 MB descomprimido)
 **Diccionario de campos:** `CMPL.txt` (51 campos documentados por NHTSA)
 
 ### Por qué este dataset
+
+Se evaluaron tres áreas de interés personal antes de decidir: **redes/infraestructura**, **call center**, y **autos/mecánica**. Se descartó call center porque, tras investigar varias fuentes (Kaggle, data.world), no existe un dataset público de call center que cumpla simultáneamente los 5 requisitos del curso (fecha con continuidad, texto libre, numérico, categórico, 5000+ filas) — la mayoría de datasets de ese dominio son o puramente transaccionales (sin texto) o transcripciones (sin fecha/numérico). Se descartó redes por el mismo motivo: los datasets de intrusion detection casi nunca traen texto libre ni fechas con continuidad real.
 
 Se eligió NHTSA Complaints porque:
 - Cumple los 5 requisitos desde el archivo crudo, sin necesidad de combinar fuentes
@@ -99,7 +101,7 @@ Columnas con proporción baja de nulos (~1.3%): `VIN`, `ORIG_OWNER_YN`, `ANTI_BR
 ### Paso 7 — Limpieza de outliers en millaje (`MILES`)
 Se calculó el rango intercuartílico (IQR): Q1 = 27,000, Q3 = 110,000, IQR = 83,000, límite estadístico puro = Q3 + 1.5×IQR = **234,500 millas**.
 
-**Decisión:** se usó un límite ajustado de **400,000 millas** en vez del límite estadístico puro, porque el límite de 234,500 descartaría vehículos reales de alto kilometraje en circulación. Se eliminaron 393 filas con MILES > 400,000 (0.26% de los registros con dato de millaje).
+**Decisión:** se usó un límite ajustado de **400,000 millas** en vez del límite estadístico puro, porque el límite de 234,500 descartaría vehículos reales de alto kilometraje en circulación (evidencia empírica propia: vehículo personal con 244,000 km funcional). Se eliminaron 393 filas con MILES > 400,000 (0.26% de los registros con dato de millaje).
 
 Los 268,754 registros sin dato de millaje (64% del total) se dejaron como `NaN` — no se rellenaron con media/mediana porque distorsionaría significativamente el análisis dado el volumen, y no se eliminaron las filas porque conservan información valiosa en otras columnas (marca, descripción, componente).
 
@@ -150,6 +152,17 @@ Resultado: 2,329 modelos únicos sobre 411,156 filas. Los modelos más frecuente
 ### Nota sobre el alcance de "vehículo" (`PROD_TYPE == 'V'`)
 Se confirmó que la categoría "Vehículo" de NHTSA es más amplia que "automóvil de pasajeros": incluye motocicletas, casas rodantes (RVs), remolques, buses escolares y equipo montado sobre chasís (grúas, plataformas aéreas). Se decidió conservar el dataset así, sin acotar más, ya que el interés del análisis (fallas mecánicas y de seguridad) aplica igualmente a estas categorías, y NHTSA no ofrece una columna directa para distinguir "auto de pasajeros" de otros vehículos motorizados sin inferencia adicional.
 
+### Paso 15 — Valores centinela en `INJURED`, `DEATHS` y `VEH_SPEED`
+Al explorar estas columnas numéricas durante la Práctica 2, se detectaron valores máximos sospechosamente redondos: `INJURED == 99`, `DEATHS == 99`, `VEH_SPEED == 999`. La hipótesis inicial fue que se trataba de códigos centinela de "dato no reportado", similar al `9999` de `YEARTXT`.
+
+Antes de aplicar el mismo tratamiento sin más, se investigó la distribución completa de cada columna con `value_counts()` ordenado descendente, para verificar si el valor sospechoso era un salto aislado o parte de un rango más amplio de datos corruptos:
+
+- **`INJURED`**: la distribución decrece de forma gradual y plausible hasta 60 heridos, sin saltos anómalos antes de 99. Se trató únicamente el valor exacto `99` como centinela (4 filas afectadas), dejando el resto de valores altos (60, 45, 40, etc.) intactos por ser física y estadísticamente posibles en incidentes graves (ej. volcadura de autobús).
+- **`DEATHS`**: mismo criterio — solo se trató el valor exacto `99` (5 filas), ya que valores como 45 o 12 muertes, aunque raros, no son imposibles.
+- **`VEH_SPEED`**: aquí la evidencia fue distinta. Se encontraron 257 registros (de 237,786 con dato, 0.1%) por encima de 200 mph, con muchos valores en el rango 600–900 antes de llegar al máximo de 999 — no era un valor aislado, sino una cola completa de datos físicamente imposibles para un vehículo terrestre. Se aplicó un umbral de plausibilidad física de 200 mph (superior a cualquier auto de producción en carretera), convirtiendo a `NaN` todo valor por encima con `.where()`, en vez de tratar únicamente el `999` exacto con `.replace()`.
+
+En los tres casos se optó por convertir a `NaN` en vez de eliminar la fila completa, siguiendo el mismo criterio aplicado a `YEARTXT`: la proporción afectada es mínima (<0.1% en cada columna) y el resto de la fila conserva información valiosa para el análisis.
+
 ---
 
 ## 4. Verificaciones adicionales realizadas
@@ -177,6 +190,14 @@ Se confirmó que la categoría "Vehículo" de NHTSA es más amplia que "automóv
 
 ---
 
-## 6. Nota sobre uso de IA
+## 6. Pendientes / mejoras futuras (no bloqueantes para la entrega)
+
+- Evaluar si `BRAUN` y `BRAUNABILITY` (columna `MFR_NAME`) son la misma entidad en distintas épocas (Braun Corp se renombró) — pendiente de confirmar con fuente.
+- Revisar `CITY` y formato de `VIN` si en algún momento se requiere análisis geográfico o validación de identificador de vehículo — se consideró de bajo impacto para los análisis planeados (regresión, KNN, clustering, forecasting) y se dejó fuera del alcance de la Práctica 1.
+- `CDESCR` (texto libre de la queja) se dejará sin normalizar hasta la Práctica 9 (análisis de texto/nube de palabras), donde aplican técnicas distintas (tokenización, stopwords, etc.) a las usadas aquí para columnas categóricas.
+
+---
+
+## 7. Nota sobre uso de IA
 
 Este código fue desarrollado bajo la modalidad de Pair Programming (Conductor/Navegante) permitida por el curso: toda la lógica y decisiones fueron escritas y tomadas por el estudiante; la asistencia de IA se limitó a depuración conceptual de errores, sugerencias de sintaxis/librerías, y preguntas guía para que el estudiante llegara a sus propias conclusiones e interpretaciones. Ningún hallazgo, conclusión de negocio, ni interpretación de resultados fue generado por la IA — cada decisión (umbral de outliers, qué fusionar y qué no, qué eliminar vs. rellenar) fue evaluada y decidida por el estudiante con su propio criterio, incluyendo instancias donde se cuestionaron y rechazaron sugerencias automáticas por falta de justificación suficiente.

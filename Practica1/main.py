@@ -75,6 +75,13 @@ def create_column_comp(df):
     df['COMP_MAIN'] = df['COMPDESC'].str.split(':').str[0].str.upper().str.strip()
     return df
 
+def refill_centinelas(df):
+    df['INJURED'] = df['INJURED'].replace(99, pd.NA)
+    df['DEATHS'] = df['DEATHS'].replace(99, pd.NA)
+    df['VEH_SPEED'] = df['VEH_SPEED'].where(df['VEH_SPEED'] <= 200, pd.NA)
+    return df
+
+
 def main():
     data_path = 'COMPLAINTS_RECEIVED_2020-2024.txt'
     doc_path = "CMPL.txt"
@@ -94,6 +101,7 @@ def main():
     df = create_column_comp(df)
     df = normalizar_marca(df, "COMP_MAIN", specials_comp_main)
     df = normalizar_marca(df, "MODELTXT", specials_modeltxt)
+    df = refill_centinelas(df)
     df.to_csv('../data/nhtsa_clean.csv', index=False)
     print(f"Limpieza completa: {df.shape}. Archivo guardado en ../data/nhtsa_clean.csv")
 
