@@ -20,6 +20,8 @@ def eta_cuadrado(grupos):
     ss_entre = sum(len(g) * (g.mean() - gran_media) ** 2 for g in grupos)
     return ss_entre / ss_total
 
+def eta_cuadrado_H(H, n):
+    return H / (n - 1)
 # =========================================================
 # COMPARACIÓN 1 — VEH_SPEED según CRASH (2 grupos)
 # =========================================================
@@ -34,7 +36,6 @@ grupo_no = df_speed[df_speed['CRASH'] == 'N']['VEH_SPEED']
 
 levene_speed = stats.levene(grupo_si, grupo_no)
 print(f"\nLevene VEH_SPEED~CRASH: stat={levene_speed.statistic:.3f}, p={levene_speed.pvalue:.4f}")
-# p < 0.05 -> varianzas NO homogéneas
 
 t_result = stats.ttest_ind(grupo_si, grupo_no, equal_var=False)
 u_result = stats.mannwhitneyu(grupo_si, grupo_no, alternative='two-sided')
@@ -45,8 +46,6 @@ print(f"Media VEH_SPEED (CRASH=Y): {grupo_si.mean():.2f}")
 print(f"t-test (Welch): stat={t_result.statistic:.3f}, p={t_result.pvalue:.6f}")
 print(f"Mann-Whitney: stat={u_result.statistic:.3f}, p={u_result.pvalue:.6f}")
 print(f"Cohen's d: {d:.3f}")
-# VEH_SPEED no es normal (asimetría vista en Práctica 2) y Levene rechaza homocedasticidad
-# -> se reporta Mann-Whitney como la prueba válida, no el t-test.
 
 # =========================================================
 # COMPARACIÓN 2 — MILES según COMP_MAIN (n grupos)
@@ -75,9 +74,10 @@ print_tabulate(medianas_comp.to_frame('mediana_miles'))
 anova_result = stats.f_oneway(*grupos_comp)
 kruskal_result = stats.kruskal(*grupos_comp)
 eta2 = eta_cuadrado(grupos_comp)
+n_total = sum(len(g) for g in grupos_comp)
+eta2_H = eta_cuadrado_H(kruskal_result.statistic, n_total)
 
 print(f"\nANOVA: stat={anova_result.statistic:.3f}, p={anova_result.pvalue:.6f}")
 print(f"Kruskal-Wallis: stat={kruskal_result.statistic:.3f}, p={kruskal_result.pvalue:.6f}")
-print(f"Eta-cuadrado: {eta2:.4f}")
-# MILES tiene asimetría 0.76 (Práctica 2) y Levene rechaza homocedasticidad
-# -> se reporta Kruskal-Wallis como la prueba válida, no el ANOVA clásico.
+print(f"Eta-cuadrado (clásico, ANOVA): {eta2:.4f}")
+print(f"Eta-cuadrado (basado en H, compatible con Kruskal-Wallis): {eta2_H:.4f}")

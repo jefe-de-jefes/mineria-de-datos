@@ -79,9 +79,9 @@ Mediana de MILES por componente, de menor a mayor:
 | ENGINE | 81,000 |
 | ENGINE AND ENGINE COOLING | 86,141 |
 
-ANOVA y Kruskal-Wallis salieron con p prácticamente cero, eta cuadrado de 0.0276. Como `MILES` ya tenía asimetría de 0.76 desde la Práctica 2, y Levene rechaza homocedasticidad, la prueba que corresponde reportar es Kruskal-Wallis.
+ANOVA y Kruskal-Wallis salieron con p prácticamente cero. Como MILES ya tenía asimetría de 0.76 desde la Práctica 2, y Levene rechaza homocedasticidad, la prueba que corresponde reportar es Kruskal-Wallis, así que el tamaño de efecto que importa aquí no es el eta cuadrado clásico (0.0276, calculado con la fórmula de ANOVA), sino uno construido a partir del estadístico H de Kruskal-Wallis: 0.0332. Se dejó el clásico como referencia porque es el número que aparece en casi cualquier libro de estadística básica, pero mezclarlo con una prueba no paramétrica es un poco inconsistente, y el segundo es el que corresponde al marco que sí se está usando.
 
-El eta cuadrado tan bajo dice algo importante en términos simples: saber en qué componente falló el auto casi no ayuda a predecir a cuántas millas va a fallar. El componente explica menos del 3% de esa variación. Dentro de cada categoría hay autos que fallan rapidísimo y otros que aguantan muchísimo, y esa mezcla es tan grande que opaca cualquier patrón general entre componentes.
+Los dos números están cerca, así que la conclusión no cambia: saber en qué componente falló el auto casi no ayuda a predecir a cuántas millas va a fallar. El componente explica entre el 3% y el 3.3% de esa variación. Dentro de cada categoría hay autos que fallan rapidísimo y otros que aguantan muchísimo, y esa mezcla es tan grande que opaca cualquier patrón general entre componentes.
 
 Dicho eso, con las medianas sí se ve algo consistente con lo que cualquiera esperaría de un auto. Visibilidad, o sea limpiaparabrisas, luces, espejos, es lo que falla más pronto, con mediana de 31,000 millas — tiene sentido, son piezas expuestas todos los días al sol, la lluvia y el uso constante. En el otro extremo está motor y sistema de enfriamiento, con mediana de 86,141 millas, y eso también coincide con la fama que tiene el motor de ser de las partes más resistentes del auto si se le da mantenimiento.
 
