@@ -69,6 +69,48 @@ Se corrió K-Means con k de 2 a 10 y se graficó la inercia (suma de distancias 
 
 En ambas gráficas de dispersión, el cluster 0 se distingue extendiéndose hacia valores más altos de gravedad y de tasa de choques que los demás clusters, aunque en la zona de valores bajos los 5 colores se mezclan bastante — es esperable, ya que estas gráficas solo muestran 2 de las 5 dimensiones que el modelo usó para agrupar; el heatmap de promedios escalados (sección 5.1) da una lectura más completa y confiable de cómo se diferencian los 5 clusters en conjunto.
 
+## 6. Marcas en cada perfil
+
+Para conectar los clusters con marcas reales, se contó cuántas combinaciones marca-año cayeron en cada uno. En total son 589 combinaciones: 72 en el cluster 0 (mayor riesgo) y 151 en el cluster 3 (menor riesgo). Se muestran las 10 marcas con más combinaciones en cada uno, junto con el total de combinaciones de la marca y la proporción que cae en el cluster.
+
+### Cluster 0
+
+| Marca | En el cluster | Total de la marca | Proporción |
+|---|---|---|---|
+| Lexus | 12 | 19 | 63% |
+| Toyota | 6 | 25 | 24% |
+| BMW | 5 | 23 | 22% |
+| Mitsubishi | 4 | 8 | 50% |
+| Cadillac | 3 | 19 | 16% |
+| Honda | 3 | 28 | 11% |
+| Lincoln | 3 | 17 | 18% |
+| Mazda | 3 | 17 | 18% |
+| Mercedes Benz | 3 | 23 | 13% |
+| Volvo | 3 | 14 | 21% |
+
+### Cluster 3
+
+| Marca | En el cluster | Total de la marca | Proporción |
+|---|---|---|---|
+| Volkswagen | 11 | 19 | 58% |
+| Cadillac | 8 | 19 | 42% |
+| Land Rover | 8 | 13 | 62% |
+| Subaru | 8 | 20 | 40% |
+| Buick | 7 | 17 | 41% |
+| Lincoln | 7 | 17 | 41% |
+| Audi | 6 | 14 | 43% |
+| Chevrolet | 6 | 26 | 23% |
+| Dodge | 6 | 21 | 29% |
+| GMC | 6 | 19 | 32% |
+
+Entre las marcas con al menos 8 combinaciones, Lexus (63%) y Mitsubishi (50%) son las que más concentran sus años en el cluster 0. En el cluster 3, Land Rover (62%) y Volkswagen (58%) son las de mayor concentración entre las que tienen al menos 13.
+
+Algunas precauciones al leer las tablas:
+
+- La unidad es la combinación marca-año, no la marca. Una misma marca puede tener años en clusters distintos: Cadillac, Lincoln, Honda y Mazda aparecen tanto en el cluster 0 como en el 3.
+- Las marcas con pocas combinaciones dan proporciones altas con poca base. Por ejemplo, Rivian tiene sus 2 combinaciones en el cluster 0, y en el cluster 3 hay marcas con 1 de 1 (Polestar, Fisker, Keystone).
+- Cada perfil describe las quejas reportadas de esa combinación, no la probabilidad de que un auto de esa marca y año falle. Una marca con más quejas graves en el dataset no implica necesariamente más fallas en la población de autos que circulan.
+
 ## 6. Limitaciones
 
 Las gráficas de dispersión de 2 variables no reflejan completamente cómo se separaron los clusters, ya que el modelo agrupó considerando las 5 variables a la vez — dos puntos pueden verse cercanos en un plano de 2 dimensiones y pertenecer a clusters distintos por estar lejos entre sí en otra de las variables no graficadas.

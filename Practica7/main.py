@@ -59,6 +59,17 @@ df_risk_scaled_df['cluster'] = kmeans_final.labels_
 
 df_riesgo['cluster'] = kmeans_final.labels_
 
+#modelos en cada cluster
+
+total = df_riesgo.index.get_level_values('MAKETXT').value_counts()
+for c in [0, 3]:
+    grupo = df_riesgo[df_riesgo['cluster'] == c]
+    en_cluster = grupo.index.get_level_values('MAKETXT').value_counts()
+    tabla_marcas = pd.DataFrame({'en_cluster': en_cluster, 'total': total.loc[en_cluster.index]})
+    tabla_marcas['proporcion_%'] = (tabla_marcas['en_cluster'] / tabla_marcas['total'] * 100).round(0)
+    print(c, len(grupo))
+    print(tabla_marcas.head(10))
+
 #grafica de clusters
 
 #grafica de miles vs gravedad
