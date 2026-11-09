@@ -172,7 +172,7 @@ python3 scripts/herramientas/verificar.py
 
 ## 9. Video
 
-link del video
+https://youtu.be/_rHEjH6_4kQ
 
 ## 10. Nota sobre uso de IA
 

@@ -1,6 +1,6 @@
 # Minería de Datos
 
-**Alumno:** Luis
+**Alumno:** Luis Fernando Segobia Torres 2177528
 **Carrera:** Licenciatura en Ciencias Computacionales
 **Facultad:** Facultad de Ciencias Físico Matemáticas (FCFM), UANL
 **Semestre:** 7mo semestre
@@ -10,7 +10,7 @@
 
 ## Sobre este repositorio
 
-Este repositorio contiene las prácticas de la materia de Minería de Datos, desarrolladas de forma incremental a lo largo del semestre sobre un mismo conjunto de datos, tal como lo pide el curso.
+Este repositorio contiene las prácticas y el proyecto integrador (PIA) de la materia de Minería de Datos, desarrollados de forma incremental a lo largo del semestre sobre un mismo conjunto de datos, tal como lo pide el curso.
 
 ## Dataset
 
@@ -22,33 +22,61 @@ Base de datos pública con quejas de seguridad reportadas por consumidores sobre
 
 El detalle completo de la elección del dataset, la limpieza aplicada y la justificación de cada decisión está documentado en [`Practica1/README_Practica1.md`](./Practica1/README_Practica1.md).
 
+## Contenido
+
+| Carpeta | Tema |
+|---|---|
+| `Practica1/` | Limpieza de datos |
+| `Practica2/` | Estadística descriptiva |
+| `Practica3/` | Visualización de datos |
+| `Practica4/` | Pruebas estadísticas |
+| `Practica5/` | Modelos lineales y correlación |
+| `Practica6/` | Clasificación de datos (KNN) |
+| `Practica7/` | Agrupamiento de datos (K-Means) |
+| `Practica8/` | Pronóstico (Forecasting) |
+| `Practica9/` | Análisis de texto |
+| `PIA/` | Proyecto integrador: riesgo de quejas por marca, modelo y año |
+
+## PIA
+
+Clasificador de texto para rellenar el componente faltante de las quejas, K-Means para agrupar las combinaciones marca-modelo-año en un semáforo de riesgo (Verde, Amarillo, Rojo y Alerta de fuego), prueba de Kruskal-Wallis entre niveles y un dashboard en Data Studio pensado para quien va a comprar un auto usado.
+
+Dashboard: [Data Studio](https://datastudio.google.com/reporting/226addaa-9c08-432d-88c9-bb28a82a7a86)
+
 ## Estructura del repositorio
 
 ```
 mineria-de-datos/
-├── README.md                      ← este archivo
-├── Practica1/
-│   ├── main.py                    ← pipeline de carga y limpieza de datos
-│   ├── mappings.py                ← diccionarios de normalización y listas de configuración
-│   ├── README_Practica1.md        ← documentación detallada de la Práctica 1
-│   ├── CMPL.txt                   ← diccionario de campos oficial de NHTSA
-│   └── COMPLAINTS_RECEIVED_2020-2024.txt   ← dataset crudo (vía Git LFS)
-├── .gitattributes                 ← configuración de Git LFS
+├── README.md
+├── data/
+│   └── nhtsa_clean.csv
+├── Practica1/ ... Practica9/
+├── PIA/
+│   ├── main.py
+│   ├── scripts/
+│   ├── resultados/
+│   ├── dashboard/
+│   └── img/
+├── .gitattributes
 └── .gitignore
 ```
 
-Cada práctica futura se organiza en su propia carpeta (`Practica2/`, `Practica3/`, etc.), siguiendo la misma convención.
+Cada práctica tiene su propia carpeta con su código y, cuando aplica, su `README_PracticaN.md` y una carpeta `img/` con las gráficas.
 
 ## Cómo reproducir
 
-El dataset limpio no se versiona en este repositorio (solo el dataset crudo y el código que lo procesa, siguiendo buenas prácticas de control de versiones). Para regenerarlo:
+El dataset limpio se versiona con Git LFS en `data/nhtsa_clean.csv`. Para regenerarlo desde el archivo crudo:
 
 ```bash
 cd Practica1
 python3 main.py
 ```
 
-Esto descarga las dependencias necesarias vía `pandas`, procesa el archivo crudo `COMPLAINTS_RECEIVED_2020-2024.txt`, y genera el dataset limpio en `../data/nhtsa_clean.csv`.
+Esto procesa el archivo crudo `COMPLAINTS_RECEIVED_2020-2024.txt` con `pandas` y genera el dataset limpio en `../data/nhtsa_clean.csv`.
+
+Cada práctica posterior lee `../data/nhtsa_clean.csv`. El PIA se corre desde su carpeta con `python3 main.py`; las instrucciones están en [`PIA/README_PIA.md`](./PIA/README_PIA.md).
+
+Los archivos `.csv` y `.txt` se guardan con Git LFS, así que hay que tener `git lfs` instalado antes de clonar.
 
 ## Nota sobre uso de IA
 
